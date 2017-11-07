@@ -66,8 +66,10 @@ def my_input(driver, a, res, inp):
     #            wj(driver)
     #            elem.clear()
                 wj(driver)
-                if pole in ['УлицаРАБ', 'УлицаРЕГ', 'УлицаФАКТ']:
-                    res[pole] = s_minus(res[pole]).replace('.',' ')
+                if pole in ['УлицаРАБ', 'УлицаРЕГ', 'УлицаФАКТ', 'НазвДолжности']:
+                    res[pole] = s_minus(res[pole]).replace('.',' ').replace(',',' ').replace(';',' ').replace('  ',' ')
+                if pole in ['ДомРАБ', 'ДомРЕГ', 'ДомФАКТ','КорпусРАБ', 'КорпусРЕГ', 'КорпусФАКТ']:
+                    res[pole] = res[pole].replace(' ','')
                 if pole in ['РегионРАБ', 'РегионРЕГ', 'РегионФАКТ']:
                     res[pole] = s_minus(res[pole]).replace('.',' ').upper()
                     if res[pole].find('РЕСП') > -1:
