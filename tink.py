@@ -87,9 +87,9 @@ def my_input(driver, a, res, inp):
 # driver = webdriver.Chrome(DRIVER_PATH)  # Инициализация драйвера
 #driver = webdriver.Firefox()  # Инициализация драйвера
 
-now = datetime.datetime.now().timetuple().tm_hour
-if now < 10 or now > 21:
-    print('\n'+ datetime.datetime.now().strftime("%H:%M:%S") + ' Не рабочее время. Работа скрипта окончена')
+now = datetime.datetime.now()
+if now.timetuple().tm_hour < 10 or now.timetuple().tm_hour > 21:
+#    print(datetime.datetime.now().strftime("%H:%M:%S") + ' Не рабочее время. Работа скрипта окончена')
     sys.exit()
 
 webconfig = read_config(filename='tink.ini', section='web')
@@ -111,9 +111,10 @@ for i, sel_i in enumerate(selectity):
         main_sql += selectity[sel_i]['SQL'] + ','
 
 main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
-                           'WHERE b.status_code=0 OR ' \
-                           '(b.status_code=101 AND b.error_message="Укажите серию и номер паспорта") OR ' \
-                           '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
+                'WHERE b.status_code=0 OR ' \
+                '(b.status_code=101 AND b.error_message="Укажите серию и номер паспорта") OR ' \
+                '(b.status_code=101 AND b.error_message="Укажите название организации в которой работаете") OR ' \
+                '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
 
 #main_sql = "SELECT banks.bank_id, banks.bank_name, banks.type_rasch, banks.per_day, banks.koef_185_fz, " \
 #      "gar_banks.delta, gar_banks.summ, gar_banks.perc_fz_44, gar_banks.min_fz_44 FROM gar_banks,banks" \
@@ -126,10 +127,10 @@ cursor.execute(main_sql)
 rows = cursor.fetchall()
 conn.close()
 
-print('\n'+ datetime.datetime.now().strftime("%H:%M:%S") +' Скрипт выгрузки. Начинаем \n')
+# print(datetime.datetime.now().strftime("%H:%M:%S") +' Скрипт выгрузки. Начинаем \n')
 
 if len(rows) < 1:
-    print('\n'+ datetime.datetime.now().strftime("%H:%M:%S") + ' Нет новых договоров. Работа скрипта окончена')
+#    print(datetime.datetime.now().strftime("%H:%M:%S") + ' Нет новых договоров. Работа скрипта окончена')
     sys.exit()
 
 # authorize(driver, **webconfig)  # Авторизация
@@ -139,8 +140,8 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     conn = MySQLConnection(**dbconfig)
     if error != '':
         cursor = conn.cursor()
-        print('\n При заполнении анкеты', res_inp['ФИО'], 'допущены ошибки:')
-        print(error)
+        print(str(now.timetuple().tm_hour) + '#' + str(now.timetuple().tm_min),
+              datetime.datetime.now().strftime("%H:%M:%S"), 'Ошибка в анкете', res_inp['ФИО'], ':', error)
         sql = 'UPDATE contracts SET status_code=101, transaction_date=NULL, error_message=%s  WHERE client_id=%s AND id>-1'
         cursor.execute(sql, (error, res_inp['iId']))
         conn.commit()
@@ -188,7 +189,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
             j += 1
 
     cursor = conn.cursor()
-    sql = 'UPDATE contracts SET status_code=1, transaction_date=NOW() WHERE client_id=%s AND id>-1'
+    sql = 'UPDATE contracts SET status_code=1, transaction_date=NOW(), error_message=NULL WHERE client_id=%s AND id>-1'
     cursor.execute(sql, (res_inp['iId'],))
     conn.commit()
     conn.close()
@@ -582,14 +583,14 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     cursor = conn.cursor()
     if p(d=driver, f='p', **clicktity['Загружено?']) == None:
         aa = p(d=driver, f='p', **clicktity['Ошибки'])
-        print('\n При заполнении анкеты', res_inp['ФИО'], 'допущены ошибки:' )
-#        print( '%s.' % ', '.join(aa))
-        print(aa)
+        print(str(now.timetuple().tm_hour) + '#' + str(now.timetuple().tm_min),
+              datetime.datetime.now().strftime("%H:%M:%S"), 'Ошибка в анкете', res_inp['ФИО'], ':', aa)
         sql = 'UPDATE contracts SET status_code=101, transaction_date=NULL, error_message=%s  WHERE client_id=%s AND id>-1'
         cursor.execute(sql,(aa, res_inp['iId']))
         conn.commit()
     else:
-        print(datetime.datetime.now().strftime("%H:%M:%S"), res_inp['ФИО'], ' - ok')
+        print(str(now.timetuple().tm_hour) + '#' + str(now.timetuple().tm_min),
+              datetime.datetime.now().strftime("%H:%M:%S"), res_inp['ФИО'], ' - ok')
         sql = 'UPDATE contracts SET status_code=100, transaction_date=NOW(), error_message=NULL WHERE client_id=%s AND id>-1'
         cursor.execute(sql, (res_inp['iId'],))
         conn.commit()
@@ -617,7 +618,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
 
 
 
-print('\n'+ datetime.datetime.now().strftime("%H:%M:%S") + ' Работа скрипта окончена')
+# print('\n'+ datetime.datetime.now().strftime("%H:%M:%S") + ' Работа скрипта окончена')
 
 
 
