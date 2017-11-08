@@ -91,60 +91,66 @@ webconfig = read_config(filename='tink.ini', section='web')
 fillconfig = read_config(filename='tink.ini', section='fill')
 dbconfig = read_config(filename='tink.ini', section='mysql')
 
-conn = MySQLConnection(**dbconfig) # Открываем БД из конфиг-файла
-cursor = conn.cursor()
-
 ## Формируем SQL
-sql = 'SELECT '
+main_sql = 'SELECT '
 for i, inp_i in enumerate(clicktity):
     if str(type(clicktity[inp_i]['SQL']))=="<class 'str'>" and clicktity[inp_i]['SQL'] != '':
-        sql += clicktity[inp_i]['SQL'] + ','
+        main_sql += clicktity[inp_i]['SQL'] + ','
 
 for i, inp_i in enumerate(inputtity):
     if str(type(inputtity[inp_i]['SQL']))=="<class 'str'>" and inputtity[inp_i]['SQL'] != '':
-        sql += inputtity[inp_i]['SQL'] + ','
+        main_sql += inputtity[inp_i]['SQL'] + ','
 
 for i, sel_i in enumerate(selectity):
     if selectity[sel_i]['SQL'] != '':
-        sql += selectity[sel_i]['SQL'] + ','
+        main_sql += selectity[sel_i]['SQL'] + ','
 
-sql = sql[:len(sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
+main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
                            'WHERE b.status_code=0 OR ' \
-                           '(b.status_code=101 AND b.error_message="Укажите серию и номер паспорта")'
+                           '(b.status_code=101 AND b.error_message="Укажите серию и номер паспорта") OR ' \
+                           '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
 
-#sql = "SELECT banks.bank_id, banks.bank_name, banks.type_rasch, banks.per_day, banks.koef_185_fz, " \
+#main_sql = "SELECT banks.bank_id, banks.bank_name, banks.type_rasch, banks.per_day, banks.koef_185_fz, " \
 #      "gar_banks.delta, gar_banks.summ, gar_banks.perc_fz_44, gar_banks.min_fz_44 FROM gar_banks,banks" \
 #      " WHERE (gar_banks.bank_id = banks.bank_id) AND (banks.per_day = TRUE) AND (gar_banks.delta >= %s)" \
 #      " AND (gar_banks.summ >= %s) ORDER BY (gar_banks.delta - %s), (gar_banks.summ - %s)"
-#cursor.execute(sql, (delta.days, summ, delta.days, summ))
-cursor.execute(sql)
+#cursor.execute(main_sql, (delta.days, summ, delta.days, summ))
+conn = MySQLConnection(**dbconfig) # Открываем БД из конфиг-файла
+cursor = conn.cursor()
+cursor.execute(main_sql)
 rows = cursor.fetchall()
 conn.close()
 
 print('\n'+ datetime.datetime.now().strftime("%H:%M:%S") +' Скрипт выгрузки. Начинаем \n')
 
-if len(rows) == 0:
+if len(rows) < 1:
     print('\n'+ datetime.datetime.now().strftime("%H:%M:%S") + ' Нет новых договоров. Работа скрипта окончена')
     sys.exit()
 
 # authorize(driver, **webconfig)  # Авторизация
 
 error = ''
-for k, row in enumerate(rows):                    # Цикл по строкам таблицы (основной)
+while len(rows) > 0:                    # Цикл по строкам таблицы (основной)
+    conn = MySQLConnection(**dbconfig)
     if error != '':
-        conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
         print('\n При заполнении анкеты', res_inp['ФИО'], 'допущены ошибки:')
         print(error)
         sql = 'UPDATE contracts SET status_code=101, transaction_date=NULL, error_message=%s  WHERE client_id=%s AND id>-1'
         cursor.execute(sql, (error, res_inp['iId']))
         conn.commit()
-        conn.close()
         driver.close()
         error = ''
+        cursor = conn.cursor()
+        cursor.execute(main_sql)
+        rows = cursor.fetchall()
+        if len(rows) < 1:
+            continue
 
+    row = rows[0]
     driver = webdriver.Chrome()  # Инициализация драйвера
     driver.implicitly_wait(10)
+    driver.set_window_size(960, 900)
     j = 0
     res_cli = {}
     for i, inp_i in enumerate(clicktity):
@@ -176,7 +182,13 @@ for k, row in enumerate(rows):                    # Цикл по строкам
             res_sel[sel_i] = row[j]
             j += 1
 
-#    driver.switch_to.frame(driver.find_element_by_tag_name("iframe")) # Переключаемся во фрейм
+    cursor = conn.cursor()
+    sql = 'UPDATE contracts SET status_code=1, transaction_date=NOW() WHERE client_id=%s AND id>-1'
+    cursor.execute(sql, (res_inp['iId'],))
+    conn.commit()
+    conn.close()
+
+    #    driver.switch_to.frame(driver.find_element_by_tag_name("iframe")) # Переключаемся во фрейм
                                                                             # Открытие страницы c subid'ами
     link = 'https://ad.admitad.com/g/47rub4kekv6fa4326e145f4e53bb13/?subid=finmarket&subid1=' + res_inp['iId']
     driver.get(url=link)
@@ -576,6 +588,9 @@ for k, row in enumerate(rows):                    # Цикл по строкам
         sql = 'UPDATE contracts SET status_code=100, transaction_date=NOW(), error_message=NULL WHERE client_id=%s AND id>-1'
         cursor.execute(sql, (res_inp['iId'],))
         conn.commit()
+    cursor = conn.cursor()
+    cursor.execute(main_sql)
+    rows = cursor.fetchall()
     conn.close()
     driver.close()
 
