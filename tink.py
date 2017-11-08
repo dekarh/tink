@@ -87,6 +87,11 @@ def my_input(driver, a, res, inp):
 # driver = webdriver.Chrome(DRIVER_PATH)  # Инициализация драйвера
 #driver = webdriver.Firefox()  # Инициализация драйвера
 
+now = datetime.datetime.now().timetuple().tm_hour
+if now < 10 or now > 21:
+    print('\n'+ datetime.datetime.now().strftime("%H:%M:%S") + ' Не рабочее время. Работа скрипта окончена')
+    sys.exit()
+
 webconfig = read_config(filename='tink.ini', section='web')
 fillconfig = read_config(filename='tink.ini', section='fill')
 dbconfig = read_config(filename='tink.ini', section='mysql')
@@ -584,7 +589,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         cursor.execute(sql,(aa, res_inp['iId']))
         conn.commit()
     else:
-        print(res_inp['ФИО'], ' - ok')
+        print(datetime.datetime.now().strftime("%H:%M:%S"), res_inp['ФИО'], ' - ok')
         sql = 'UPDATE contracts SET status_code=100, transaction_date=NOW(), error_message=NULL WHERE client_id=%s AND id>-1'
         cursor.execute(sql, (res_inp['iId'],))
         conn.commit()
