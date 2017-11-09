@@ -140,6 +140,7 @@ selectity = {
 'Автомобиль' : {'t': 'x', 's': '//SELECT[@name="asset_foreign_vehicle_flag"]/..', 'SQL': "b.status_car_code"}, # Автомобиль
 'ГодАвто' : {'t': 'x', 's': '//SPAN[text()="Год выпуска"]/../../../..' , 'SQL': "b.car_production_year"},
 'ЧастоЗагран' : {'t': 'x', 's': '//SELECT[@name="visit_foreign_country_frequency"]/..' , 'SQL': "b.travel_information_code"},
+'КакДавноТел' : {'t': 'x', 's': '//SELECT[@name="mob_used"]/..' , 'SQL': "b.phone_status_code"},
 
 #'ПрПолисКАСКО' : {'t': 'x', 's': '//[@class="tcs-plugin-select2"])[16]'   , 'SQL': "auto_kasko_attachment_id"}, # Полис страхования КАСКО
 #'ПрСНИЛС' : {'t': 'x', 's': '//[@class="tcs-plugin-select2"])[18]'   , 'SQL': "number_attachment_id"}, # Предоставит СНИЛС
@@ -224,6 +225,13 @@ select_selectity = {
                 {'t': 'x', 's': '//SPAN[text()="1-2 раза в год"]', 'txt': '1-2 раза в год'},
                 {'t': 'x', 's': '//SPAN[text()="3-5 раз в год"]', 'txt': '3-5 раз в год'},
                 {'t': 'x', 's': '//SPAN[text()="Чаще 6 раз в год"]', 'txt': 'Чаще 6 раз в год'},],
+'КакДавноТел' : [{'t': 'x', 's': '//SPAN[text()="Меньше 1 месяца"]', 'txt': 'Не выбрано'},
+                {'t': 'x', 's': '//SPAN[text()="Меньше 1 месяца"]', 'txt': 'Меньше 1 месяца'},
+                {'t': 'x', 's': '//SPAN[text()="1 - 6 месяца"]', 'txt': '1 - 6 месяца'},
+                {'t': 'x', 's': '//SPAN[text()="6 месяцев - 2 года"]', 'txt': '6 месяцев - 2 года'},
+                {'t': 'x', 's': '//SPAN[text()="2 - 5 лет"]', 'txt': '2 - 5 лет'},
+                {'t': 'x', 's': '//SPAN[text()="Больше 5 лет"]', 'txt': 'Больше 5 лет'},
+                {'t': 'x', 's': '//SPAN[text()="Не помню"]', 'txt': 'Не помню'},],
 
 'СкДетей' : {'t': 'x', 's': '//[@class="tcs-plugin-select2"])[3]'    , 'SQL': "status_childs_code"}, # Количество детей
 'ПросрочкиПоКредитам' : {'t': 'x', 's': '//[@class="tcs-plugin-select2"])[8]'    , 'SQL': "status_credit_delay_code"}, # Просрочки по текущим кредитам

@@ -116,11 +116,6 @@ main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contrac
                 '(b.status_code=101 AND b.error_message="Укажите название организации в которой работаете") OR ' \
                 '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
 
-#main_sql = "SELECT banks.bank_id, banks.bank_name, banks.type_rasch, banks.per_day, banks.koef_185_fz, " \
-#      "gar_banks.delta, gar_banks.summ, gar_banks.perc_fz_44, gar_banks.min_fz_44 FROM gar_banks,banks" \
-#      " WHERE (gar_banks.bank_id = banks.bank_id) AND (banks.per_day = TRUE) AND (gar_banks.delta >= %s)" \
-#      " AND (gar_banks.summ >= %s) ORDER BY (gar_banks.delta - %s), (gar_banks.summ - %s)"
-#cursor.execute(main_sql, (delta.days, summ, delta.days, summ))
 conn = MySQLConnection(**dbconfig) # Открываем БД из конфиг-файла
 cursor = conn.cursor()
 cursor.execute(main_sql)
@@ -140,7 +135,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     conn = MySQLConnection(**dbconfig)
     if error != '':
         cursor = conn.cursor()
-        print(str(now.timetuple().tm_hour) + '#' + str(now.timetuple().tm_min),
+        print('{0:02d}'.format(now.timetuple().tm_hour) + '#' + '{0:02d}'.format(now.timetuple().tm_min),
               datetime.datetime.now().strftime("%H:%M:%S"), 'Ошибка в анкете', res_inp['ФИО'], ':', error)
         sql = 'UPDATE contracts SET status_code=101, transaction_date=NULL, error_message=%s  WHERE client_id=%s AND id>-1'
         cursor.execute(sql, (error, res_inp['iId']))
@@ -485,6 +480,22 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         wj(driver)
         elem.click()
         wj(driver)
+    if l(res_sel['КакДавноТел']) > 0:
+        elem = p(d = driver, f = 'c', **selectity['КакДавноТел'])
+        wj(driver)
+        elem2 = p(d = driver, f = 'p', **select_selectity['КакДавноТел'][l(res_sel['КакДавноТел'])])
+        wj(driver)
+        while not elem2.is_displayed():
+            elem.click()
+        wj(driver)
+        elem = p(d = driver, f = 'c', **select_selectity['КакДавноТел'][l(res_sel['КакДавноТел'])])
+        wj(driver)
+        elem.click()
+        wj(driver)
+        elem = p(d=driver, f='p', **inputtity['КакДавноТел'])
+        wj(driver)
+        elem.click()
+        wj(driver)
     elem = p(d = driver, f = 'c', **selectity['Автомобиль'])
     wj(driver)
     elem2 = p(d = driver, f = 'p', **select_selectity['Автомобиль'][int(res_sel['Автомобиль'])])
@@ -583,13 +594,13 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     cursor = conn.cursor()
     if p(d=driver, f='p', **clicktity['Загружено?']) == None:
         aa = p(d=driver, f='p', **clicktity['Ошибки'])
-        print(str(now.timetuple().tm_hour) + '#' + str(now.timetuple().tm_min),
+        print('{0:02d}'.format(now.timetuple().tm_hour) + '#' + '{0:02d}'.format(now.timetuple().tm_min),
               datetime.datetime.now().strftime("%H:%M:%S"), 'Ошибка в анкете', res_inp['ФИО'], ':', aa)
         sql = 'UPDATE contracts SET status_code=101, transaction_date=NULL, error_message=%s  WHERE client_id=%s AND id>-1'
         cursor.execute(sql,(aa, res_inp['iId']))
         conn.commit()
     else:
-        print(str(now.timetuple().tm_hour) + '#' + str(now.timetuple().tm_min),
+        print('{0:02d}'.format(now.timetuple().tm_hour) + '#' + '{0:02d}'.format(now.timetuple().tm_min),
               datetime.datetime.now().strftime("%H:%M:%S"), res_inp['ФИО'], ' - ok')
         sql = 'UPDATE contracts SET status_code=100, transaction_date=NOW(), error_message=NULL WHERE client_id=%s AND id>-1'
         cursor.execute(sql, (res_inp['iId'],))
