@@ -145,9 +145,9 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         cursor = conn.cursor()
         cursor.execute(main_sql)
         rows = cursor.fetchall()
-        if len(rows) < 1:
-            continue
 
+    if len(rows) < 1:
+        continue
     row = rows[0]
     driver = webdriver.Chrome()  # Инициализация драйвера
     driver.implicitly_wait(10)
@@ -432,6 +432,13 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         wj(driver)
         elem.click()
         wj(driver)
+
+    wj(driver)
+    elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
+    wj(driver)
+    elem.click()
+    wj(driver)
+
     if l(res_sel['КредитнаяИстория']) > 0:
         elem = p(d = driver, f = 'c', **selectity['КредитнаяИстория'])
         wj(driver)
@@ -448,6 +455,13 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         wj(driver)
         elem.click()
         wj(driver)
+
+    wj(driver)
+    elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
+    wj(driver)
+    elem.click()
+    wj(driver)
+
     if l(res_sel['Образование']) > 0:
         elem = p(d = driver, f = 'c', **selectity['Образование'])
         wj(driver)
@@ -464,6 +478,13 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         wj(driver)
         elem.click()
         wj(driver)
+
+    wj(driver)
+    elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
+    wj(driver)
+    elem.click()
+    wj(driver)
+
     if l(res_sel['СемейноеПоложение']) > 0:
         elem = p(d = driver, f = 'c', **selectity['СемейноеПоложение'])
         wj(driver)
@@ -480,6 +501,20 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         wj(driver)
         elem.click()
         wj(driver)
+
+    wj(driver)
+    elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
+    wj(driver)
+    elem.click()
+    wj(driver)
+
+
+    wj(driver)
+    elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
+    wj(driver)
+    elem.click()
+    wj(driver)
+
     if l(res_sel['КакДавноТел']) > 0:
         elem = p(d = driver, f = 'c', **selectity['КакДавноТел'])
         wj(driver)
@@ -492,10 +527,17 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         wj(driver)
         elem.click()
         wj(driver)
-        elem = p(d=driver, f='p', **inputtity['КакДавноТел'])
+        elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
         wj(driver)
         elem.click()
         wj(driver)
+
+    wj(driver)
+    elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
+    wj(driver)
+    elem.click()
+    wj(driver)
+
     elem = p(d = driver, f = 'c', **selectity['Автомобиль'])
     wj(driver)
     elem2 = p(d = driver, f = 'p', **select_selectity['Автомобиль'][int(res_sel['Автомобиль'])])
@@ -511,6 +553,13 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     wj(driver)
     elem.click()
     wj(driver)
+
+    wj(driver)
+    elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
+    wj(driver)
+    elem.click()
+    wj(driver)
+
     if l(res_sel['Автомобиль']) > 0:
         my_input(driver, ['МаркаАвто', 'МодельАвто', ], res_inp, inputtity)
 #        elem = p(d=driver, f='c', **clicktity['НетКАСКО'])
@@ -545,6 +594,13 @@ while len(rows) > 0:                    # Цикл по строкам табл�
             wj(driver)
             elem.click()
             wj(driver)
+
+    wj(driver)
+    elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
+    wj(driver)
+    elem.click()
+    wj(driver)
+
     if res_cli['ЕстьЗагранПаспорт'] > 0:
         elem = p(d=driver, f='c', **clicktity['ЕстьЗагранПаспорт'])
         wj(driver)
@@ -564,7 +620,27 @@ while len(rows) > 0:                    # Цикл по строкам табл�
             wj(driver)
             elem.click()
             wj(driver)
+
+    wj(driver)
+    elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
+    wj(driver)
+    elem.click()
+    wj(driver)
+
     my_input(driver, ['КодовоеСлово'], res_inp, inputtity)
+
+    conn = MySQLConnection(**dbconfig)
+    cursor = conn.cursor()
+    sql = 'SELECT status_code FROM contracts WHERE client_id=%s'
+    cursor.execute(sql, (res_inp['iId'],))
+    c_rows = cursor.fetchall()
+    if l(c_rows[0][0]) == 100:
+        cursor.execute(main_sql)
+        rows = cursor.fetchall()
+        driver.close()
+        conn.close()
+        continue
+    conn.close()
 
     elem = p(d=driver, f='c', **clicktity['Оформить'])  # Нажимаем кнопку Оформить
     wj(driver)
