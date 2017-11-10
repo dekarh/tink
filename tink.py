@@ -123,9 +123,10 @@ for i, sel_i in enumerate(selectity):
 main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
                 'WHERE b.status_code=0 OR ' \
                 '(b.status_code=101 AND b.error_message="Укажите серию и номер паспорта") OR ' \
-                '(b.status_code=101 AND b.error_message="Укажите название организации в которой работаете") OR ' \
                 '(b.status_code=101 AND b.error_message="Укажите Ваш персональный доход") OR ' \
                 '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
+
+#                '(b.status_code=101 AND b.error_message="Укажите название организации в которой работаете") OR ' \
 
 conn = MySQLConnection(**dbconfig) # Открываем БД из конфиг-файла
 cursor = conn.cursor()
@@ -217,13 +218,14 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         elem.click()
         wj(driver)
 
+    wj(driver)
     elem = p(d=driver, f='c', **clicktity['Далее'])
     wj(driver)
     elem.click()
     wj(driver)
-    error = p(d=driver, f='p', **clicktity['Ошибки'])
-    wj(driver)
-    if error != '':
+    if not chk(d=driver, f='c', **clicktity['Шаг2']):
+        error = p(d=driver, f='p', **clicktity['Ошибки'])
+        wj(driver)
         continue
 
 
@@ -330,9 +332,9 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     wj(driver)
     elem.click()
     wj(driver)
-    error = p(d=driver, f='p', **clicktity['Ошибки'])
-    wj(driver)
-    if error != '':
+    if not chk(d=driver, f='c', **clicktity['Шаг3']):
+        error = p(d=driver, f='p', **clicktity['Ошибки'])
+        wj(driver)
         continue
 
     elem = p(d = driver, f = 'c', **selectity['ТипЗанятости']) # Тип занятости
@@ -416,13 +418,14 @@ while len(rows) > 0:                    # Цикл по строкам табл�
                 elem.send_keys(' ')
         my_input(driver, ['УлицаРАБ', 'ДомРАБ', 'КорпусРАБ', 'НомОфисаРАБ'], res_inp, inputtity)
 
+    wj(driver)
     elem = p(d=driver, f='c', **clicktity['Далее'])
     wj(driver)
     elem.click()
     wj(driver)
-    error = p(d=driver, f='p', **clicktity['Ошибки'])
-    wj(driver)
-    if error != '':
+    if not chk(d=driver, f='c', **clicktity['Шаг4']):
+        error = p(d=driver, f='p', **clicktity['Ошибки'])
+        wj(driver)
         continue
 
     my_input(driver, ['ПерсДоход', 'КвартПлата'], res_inp, inputtity)
