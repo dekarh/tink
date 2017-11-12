@@ -22,13 +22,22 @@ import time
 #DRIVER_PATH = 'drivers/chromedriver'
 
 change_errors = {
-    'Выберите модель из списка' : 'Укажите марку и модель как они записаны в техпаспорте или ПТС',
+    'Выберите модель из списка' : 'Укажите марку и модель машины так, как они записаны в техпаспорте или ПТС',
+    'Выберите марку из списка' : 'Укажите марку и модель машины так, как они записаны в техпаспорте или ПТС',
+}
+change2errors = {
+    'Укажите регион' : 'Укажите адрес регистрации и проживания',
+    'Укажите номер дома' : 'Укажите номер дома в адресе регистрации и проживания',
+}
+change3errors = {
+    'Укажите регион' : 'Укажите рабочий адрес',
+    'Укажите номер дома': 'Укажите номер дома в рабочем адресе',
 }
 
 not_errors = [
-    'Укажите серию и номер паспорта',
-    'Укажите название организации в которой работаете',
-    'Укажите Ваш персональный доход',
+#    'Укажите серию и номер паспорта',
+#    'Укажите название организации в которой работаете',
+#    'Укажите Ваш персональный доход',
     ]
 
 
@@ -122,10 +131,10 @@ for i, sel_i in enumerate(selectity):
 
 main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
                 'WHERE b.status_code=0 OR ' \
-                '(b.status_code=101 AND b.error_message="Укажите серию и номер паспорта") OR ' \
-                '(b.status_code=101 AND b.error_message="Укажите Ваш персональный доход") OR ' \
                 '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
 
+#                '(b.status_code=101 AND b.error_message="Укажите серию и номер паспорта") OR ' \
+#                '(b.status_code=101 AND b.error_message="Укажите Ваш персональный доход") OR ' \
 #                '(b.status_code=101 AND b.error_message="Укажите название организации в которой работаете") OR ' \
 
 conn = MySQLConnection(**dbconfig) # Открываем БД из конфиг-файла
@@ -151,6 +160,8 @@ while len(rows) > 0:                    # Цикл по строкам табл�
             sql = 'UPDATE contracts SET status_code=0, transaction_date=NULL, error_message=NULL WHERE client_id=%s AND id>-1'
             cursor.execute(sql, (res_inp['iId'],))
         else:
+            if error in change_errors:
+                error = change_errors[error]
             print('{0:02d}'.format(now.timetuple().tm_hour) + '#' + '{0:02d}'.format(now.timetuple().tm_min),
                   datetime.datetime.now().strftime("%H:%M:%S"), 'Ошибка в анкете', res_inp['ФИО'], ':', error)
             sql = 'UPDATE contracts SET status_code=101, transaction_date=NULL, error_message=%s WHERE client_id=%s AND id>-1'
@@ -335,6 +346,8 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     if not chk(d=driver, f='c', **clicktity['Шаг3']):
         error = p(d=driver, f='p', **clicktity['Ошибки'])
         wj(driver)
+        if error in change2errors:
+            error = change2errors[error]
         continue
 
     elem = p(d = driver, f = 'c', **selectity['ТипЗанятости']) # Тип занятости
@@ -426,6 +439,8 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     if not chk(d=driver, f='c', **clicktity['Шаг4']):
         error = p(d=driver, f='p', **clicktity['Ошибки'])
         wj(driver)
+        if error in change3errors:
+            error = change3errors[error]
         continue
 
     my_input(driver, ['ПерсДоход', 'КвартПлата'], res_inp, inputtity)
@@ -694,8 +709,10 @@ while len(rows) > 0:                    # Цикл по строкам табл�
             sql = 'UPDATE contracts SET status_code=0, transaction_date=NULL, error_message=NULL WHERE client_id=%s AND id>-1'
             cursor.execute(sql,(res_inp['iId'],))
         else:
+            if aa in change_errors:
+                aa = change_errors[error]
             print('{0:02d}'.format(now.timetuple().tm_hour) + '#' + '{0:02d}'.format(now.timetuple().tm_min),
-                  datetime.datetime.now().strftime("%H:%M:%S"), 'Ошибка в анкете', res_inp['ФИО'], ':', error)
+                  datetime.datetime.now().strftime("%H:%M:%S"), 'Ошибка в анкете', res_inp['ФИО'], ':', aa)
             sql = 'UPDATE contracts SET status_code=101, transaction_date=NULL, error_message=%s WHERE client_id=%s AND id>-1'
             cursor.execute(sql,(aa, res_inp['iId']))
         conn.commit()
