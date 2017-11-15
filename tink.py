@@ -11,6 +11,7 @@ from selenium.webdriver.common.by import By
 import sys
 import datetime
 from mysql.connector import MySQLConnection, Error
+from random import random
 
 from lib import read_config, lenl, s_minus, s, l, filter_rus_sp, filter_rus_minus
 from lib_scan import wj, p, chk
@@ -60,15 +61,15 @@ def my_input2(driver, a, res, inp):
     for pole in a:
         if res[pole] != None:
             if res[pole] != '':
-                elem = p(d=driver, f='c', **inp[pole])
+                elem = p(d=driver, f='p', **inp[pole])
+#                elem.send_keys(' ')
+#                elem.clear()
                 elem.send_keys(' ')
-                elem.clear()
-                elem.send_keys(' ')
-                elem.send_keys(res[pole])
-#                for iq in range(1,150):
-#                    elem.send_keys(Keys.BACKSPACE)
-#                for fucked_char in res[pole]:
-#                    elem.send_keys(fucked_char)
+#                elem.send_keys(res[pole])
+                for iq in range(1,200):
+                    elem.send_keys(Keys.BACKSPACE)
+                for fucked_char in res[pole]:
+                    elem.send_keys(fucked_char)
                 wj(driver)
                 elem = p(d=driver, f='p', **inp['ЩелчокДляСброса'])
                 wj(driver)
@@ -106,6 +107,7 @@ def my_input(driver, a, res, inp):
 # driver = webdriver.Chrome(DRIVER_PATH)  # Инициализация драйвера
 #driver = webdriver.Firefox()  # Инициализация драйвера
 
+time.sleep(int(random()*10))
 now = datetime.datetime.now()
 if now.timetuple().tm_hour < 10 or now.timetuple().tm_hour > 21:
 #    print(datetime.datetime.now().strftime("%H:%M:%S") + ' Не рабочее время. Работа скрипта окончена')
@@ -242,6 +244,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
 
     my_input(driver, ['ДатаРождения', 'СерияНомер', 'МестоРождения', 'КодПодразд', 'ДатаВыдачи'], res_inp, inputtity)
     res_inp['КемВыдан'] = res_inp['КемВыдан'].replace('.', ' ').replace('  ', ' ').replace('  ', ' ')
+#    if len(p(d = driver, f = 'p', **inputtity['КемВыданЗнач'])) < 10:
     my_input2(driver, ['КемВыдан'], res_inp, inputtity)
     wj(driver)
 

@@ -46,6 +46,7 @@ inputtity = {
 'Email' : {'t': 'x', 's': '//INPUT[@type="text"][@name="email"]', 'SQL': "a.email"}, # Электронная почта
 'СерияНомер' : {'t': 'x', 's': '//INPUT[@type="tel"][@name="id_code_number"]' , 'SQL': "CONCAT_WS('',a.p_seria,a.p_number)"}, # Паспорт (номер и серия)
 'КемВыдан' : {'t': 'x', 's': '//TEXTAREA[@name="passport_who_given"]' , 'SQL': "a.p_police"}, # Кто выдал
+'КемВыданЗнач' : {'t': 'x', 's': '//TEXTAREA[@name="passport_who_given"]', 'a' : 'text', 'SQL': "a.p_police"},
 'ДатаВыдачи' : {'t': 'x', 's': '//INPUT[@type="tel"][@name="passport_date_given"]' , 'SQL': "DATE_FORMAT(a.p_date,'%d%m%Y')"}, # Дата выдачи
 'КодПодразд' : {'t': 'x', 's': '//INPUT[@type="tel"][@name="id_division_code"]' , 'SQL': "a.p_police_code"}, # Код подразделения
 'ДатаРождения' : {'t': 'x', 's': '//INPUT[@type="tel"][@name="birthdate"]' , 'SQL': "DATE_FORMAT(a.b_date,'%d%m%Y')"}, # Дата рождения
