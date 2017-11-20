@@ -94,6 +94,8 @@ def my_input(driver, a, res, inp):
                     res[pole] = s_minus(res[pole]).replace('.',' ').upper()
                     if res[pole].find('РЕСП') > -1:
                         res[pole] = 'РЕСП ' + res[pole].replace('РЕСП','').strip()
+                    if res[pole].find('Г') > -1:
+                        res[pole] = 'Г. ' + res[pole].replace('Г', '').strip()
                 for fucked_char in s(res[pole]):
                     elem.send_keys(fucked_char)
 
