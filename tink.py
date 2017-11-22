@@ -86,14 +86,15 @@ def my_input(driver, a, res, inp):
     #            wj(driver)
     #            elem.clear()
                 wj(driver)
-                if pole in ['УлицаРАБ', 'УлицаРЕГ', 'УлицаФАКТ', 'НазвДолжности']:
+                if pole in ['УлицаРАБ', 'УлицаРЕГ', 'УлицаФАКТ', 'НазвДолжности', 'НасПунктРАБ', 'НасПунктРЕГ', 'НасПунктФАКТ']:
                     res[pole] = s_minus(res[pole]).replace('.',' ').replace(',',' ').replace(';',' ').replace('  ',' ')
                 if pole in ['ДомРАБ', 'ДомРЕГ', 'ДомФАКТ','КорпусРАБ', 'КорпусРЕГ', 'КорпусФАКТ']:
                     res[pole] = res[pole].replace(' ','')
                 if pole in ['РегионРАБ', 'РегионРЕГ', 'РегионФАКТ']:
                     res[pole] = s_minus(res[pole]).replace('.',' ').upper()
                     if res[pole].find('РЕСП') > -1:
-                        res[pole] = 'РЕСП ' + res[pole].replace('РЕСП','').strip()
+                        if res[pole].find('УДМУРТСКАЯ') == -1:
+                            res[pole] = 'РЕСП ' + res[pole].replace('РЕСП','').strip()
                     if res[pole].find('Г') > -1:
                         res[pole] = 'Г. ' + res[pole].replace('Г', '').strip()
                 for fucked_char in s(res[pole]):
@@ -105,9 +106,6 @@ def my_input(driver, a, res, inp):
                 elem.click()
                 wj(driver)
 
-
-# driver = webdriver.Chrome(DRIVER_PATH)  # Инициализация драйвера
-#driver = webdriver.Firefox()  # Инициализация драйвера
 
 time.sleep(int(random()*10))
 now = datetime.datetime.now()
@@ -132,6 +130,9 @@ for i, inp_i in enumerate(inputtity):
 for i, sel_i in enumerate(selectity):
     if selectity[sel_i]['SQL'] != '':
         main_sql += selectity[sel_i]['SQL'] + ','
+
+#main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
+#                'WHERE b.status_code=1 AND a.p_surname = "НАГОРНЫХ"' \
 
 main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
                 'WHERE b.status_code=0 OR ' \
@@ -243,7 +244,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         wj(driver)
         continue
 
-
+    wj(driver)
     my_input(driver, ['ДатаРождения', 'СерияНомер', 'МестоРождения', 'КодПодразд', 'ДатаВыдачи'], res_inp, inputtity)
     res_inp['КемВыдан'] = res_inp['КемВыдан'].replace('.', ' ').replace('  ', ' ').replace('  ', ' ')
 #    if len(p(d = driver, f = 'p', **inputtity['КемВыданЗнач'])) < 10:
@@ -282,7 +283,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         if p(d=driver, f='p', **inputtity['НасПунктРЕГзнач']) == '':
             my_input(driver, ['НасПунктРЕГ'], res_inp, inputtity)
     if chk(d=driver, f='p', **inputtity['УлицаРЕГ']):
-        if p(d=driver, f='p', **inputtity['УлицаРЕГзнач']) != '':
+        if p(d=driver, f='p', **inputtity['УлицаРЕГзнач']) == '':
             elem = p(d=driver, f='p', **inputtity['УлицаРЕГ'])
             wj(driver)
             elem.clear()
@@ -319,7 +320,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
         if p(d=driver, f='p', **inputtity['НасПунктФАКТзнач']) == '':
             my_input(driver, ['НасПунктФАКТ'], res_inp, inputtity)
     if chk(d=driver, f='p', **inputtity['УлицаФАКТ']):
-        if p(d=driver, f='p', **inputtity['УлицаФАКТзнач']) != '':
+        if p(d=driver, f='p', **inputtity['УлицаФАКТзнач']) == '':
             elem = p(d=driver, f='p', **inputtity['УлицаФАКТ'])
             wj(driver)
             elem.clear()
@@ -355,6 +356,9 @@ while len(rows) > 0:                    # Цикл по строкам табл�
             error = change2errors[error]
         continue
 
+    wj(driver)
+    elem = p(d = driver, f = 'c', **selectity['ТипЗанятости']) # Тип занятости
+    wj(driver)
     elem = p(d = driver, f = 'c', **selectity['ТипЗанятости']) # Тип занятости
     wj(driver)
     elem.click()
@@ -426,7 +430,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
             if p(d=driver, f='p', **inputtity['НасПунктРАБзнач']) == '':
                 my_input(driver, ['НасПунктРАБ'], res_inp, inputtity)
         if chk(d=driver, f='p', **inputtity['УлицаРАБ']):
-            if p(d=driver, f='p', **inputtity['УлицаРАБзнач']) != '':
+            if p(d=driver, f='p', **inputtity['УлицаРАБзнач']) == '':
                 elem = p(d=driver, f='p', **inputtity['УлицаРАБ'])
                 wj(driver)
                 elem.clear()
@@ -448,6 +452,7 @@ while len(rows) > 0:                    # Цикл по строкам табл�
             error = change3errors[error]
         continue
 
+    wj(driver)
     my_input(driver, ['ПерсДоход', 'КвартПлата'], res_inp, inputtity)
     wj(driver)
     elem = p(d=driver, f='p', **inputtity['ЩелчокДляСброса'])
