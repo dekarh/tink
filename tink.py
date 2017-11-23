@@ -8,7 +8,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
-import sys
+import sys, subprocess
 import datetime
 from mysql.connector import MySQLConnection, Error
 from random import random
@@ -107,10 +107,21 @@ def my_input(driver, a, res, inp):
                 wj(driver)
 
 
-time.sleep(int(random()*10))
+#time.sleep(int(random()*5))
+time.sleep(int(random()*50))
 now = datetime.datetime.now()
 if now.timetuple().tm_hour < 10 or now.timetuple().tm_hour > 21:
 #    print(datetime.datetime.now().strftime("%H:%M:%S") + ' Не рабочее время. Работа скрипта окончена')
+    sys.exit()
+
+processes = subprocess.check_output(["ps", "x"]).decode().split('\n')
+tink_processes = 0
+for process in processes:
+    if process.find('python3 tink.py') > -1:
+        tink_processes += 1
+
+if tink_processes > 8:
+#    print(datetime.datetime.now().strftime("%H:%M:%S") + ' Слишком много процессов. Работа скрипта окончена')
     sys.exit()
 
 webconfig = read_config(filename='tink.ini', section='web')
@@ -131,12 +142,14 @@ for i, sel_i in enumerate(selectity):
     if selectity[sel_i]['SQL'] != '':
         main_sql += selectity[sel_i]['SQL'] + ','
 
-#main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
-#                'WHERE b.status_code=1 AND a.p_surname = "НАГОРНЫХ"' \
-
 main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
-                'WHERE b.status_code=0 OR ' \
-                '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
+                 'WHERE b.status_code=101'
+
+#                 'WHERE b.status_code=1 AND a.p_surname = "НАГОРНЫХ"' \
+
+#main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
+#                'WHERE b.status_code=0 OR ' \
+#                '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
 
 #                '(b.status_code=101 AND b.error_message="Укажите серию и номер паспорта") OR ' \
 #                '(b.status_code=101 AND b.error_message="Укажите Ваш персональный доход") OR ' \
@@ -358,8 +371,9 @@ while len(rows) > 0:                    # Цикл по строкам табл�
 
     wj(driver)
     elem = p(d = driver, f = 'c', **selectity['ТипЗанятости']) # Тип занятости
-    wj(driver)
-    elem = p(d = driver, f = 'c', **selectity['ТипЗанятости']) # Тип занятости
+    while not elem:
+        wj(driver)
+        elem = p(d = driver, f = 'c', **selectity['ТипЗанятости']) # Тип занятости
     wj(driver)
     elem.click()
     elem = p(d = driver, f = 'c', **select_selectity['ТипЗанятости'][int(res_sel['ТипЗанятости'])])
