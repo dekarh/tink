@@ -95,8 +95,13 @@ def my_input(driver, a, res, inp):
                     if res[pole].find('РЕСП') > -1:
                         if res[pole].find('УДМУРТСКАЯ') == -1:
                             res[pole] = 'РЕСП ' + res[pole].replace('РЕСП','').strip()
-                    if res[pole].find('Г') > -1:
-                        res[pole] = 'Г. ' + res[pole].replace('Г', '').strip()
+                    elif res[pole].find('ОКРУГ') > -1:
+                        q = 0
+                    elif res[pole].find('Г') > -1:
+                        if res[pole].find('МОСКВА') > -1:
+                            res[pole] = res[pole].replace('Г', '').strip()
+                        else:
+                            res[pole] = 'Г. ' + res[pole].replace('Г', '').strip()
                 for fucked_char in s(res[pole]):
                     elem.send_keys(fucked_char)
 
@@ -107,7 +112,6 @@ def my_input(driver, a, res, inp):
                 wj(driver)
 
 
-#time.sleep(int(random()*5))
 time.sleep(int(random()*50))
 now = datetime.datetime.now()
 if now.timetuple().tm_hour < 10 or now.timetuple().tm_hour > 21:
@@ -142,14 +146,14 @@ for i, sel_i in enumerate(selectity):
     if selectity[sel_i]['SQL'] != '':
         main_sql += selectity[sel_i]['SQL'] + ','
 
-main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
-                 'WHERE b.status_code=101'
-
-#                 'WHERE b.status_code=1 AND a.p_surname = "НАГОРНЫХ"' \
-
 #main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
-#                'WHERE b.status_code=0 OR ' \
-#                '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
+#                 'WHERE b.status_code=1 AND a.p_surname = "АМИРХАНОВА"' \
+
+#                 'WHERE b.status_code=101'
+
+main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
+                'WHERE b.status_code=0 OR ' \
+                '(b.status_code=1 AND b.transaction_date<DATE_SUB(NOW(),INTERVAL 10 MINUTE))'
 
 #                '(b.status_code=101 AND b.error_message="Укажите серию и номер паспорта") OR ' \
 #                '(b.status_code=101 AND b.error_message="Укажите Ваш персональный доход") OR ' \
