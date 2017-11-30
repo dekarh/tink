@@ -95,7 +95,8 @@ def my_input(driver, a, res, inp):
                     if res[pole].find('РЕСП') > -1:
                         if res[pole].find('УДМУРТСКАЯ') == -1:
                             res[pole] = 'РЕСП ' + res[pole].replace('РЕСП','').strip()
-                    elif res[pole].find('ОКРУГ') > -1:
+                    elif res[pole].find('ОКРУГ') > -1 or res[pole].find('ОБЛ') > -1 or res[pole].find('КРАЙ') > -1 \
+                                                      or res[pole].find('РАЙОН') > -1:
                         q = 0
                     elif res[pole].find('Г') > -1:
                         if res[pole].find('МОСКВА') > -1:
@@ -147,7 +148,7 @@ for i, sel_i in enumerate(selectity):
         main_sql += selectity[sel_i]['SQL'] + ','
 
 #main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
-#                 'WHERE b.status_code=1 AND a.p_surname = "АМИРХАНОВА"' \
+#                 'WHERE b.status_code=1 AND a.p_surname = "ХАГУРОВ"' \
 
 #                 'WHERE b.status_code=101'
 
