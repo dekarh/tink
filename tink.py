@@ -240,7 +240,6 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     conn.commit()
     conn.close()
 
-    #    driver.switch_to.frame(driver.find_element_by_tag_name("iframe")) # Переключаемся во фрейм
                                                                             # Открытие страницы c subid'ами
     link = 'https://ad.admitad.com/g/47rub4kekv6fa4326e145f4e53bb13/?subid=finmarket&subid1=' + res_inp['iId']
     driver.get(url=link)
