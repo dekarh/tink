@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 
 import sys, subprocess
@@ -99,10 +100,10 @@ def my_input(driver, a, res, inp):
                                                       or res[pole].find('РАЙОН') > -1:
                         q = 0
                     elif res[pole].find('Г') > -1:
-                        if res[pole].find('МОСКВА') > -1:
-                            res[pole] = res[pole].replace('Г', '').strip()
-                        else:
-                            res[pole] = 'Г. ' + res[pole].replace('Г', '').strip()
+#                        if res[pole].find('МОСКВА') > -1:
+#                            res[pole] = res[pole].replace('Г', '').strip()
+#                        else:
+                         res[pole] = 'Г. ' + res[pole].replace('Г', '').strip()
                 for fucked_char in s(res[pole]):
                     elem.send_keys(fucked_char)
 
@@ -148,7 +149,7 @@ for i, sel_i in enumerate(selectity):
         main_sql += selectity[sel_i]['SQL'] + ','
 
 #main_sql = main_sql[:len(main_sql) - 1] + ' FROM clients AS a INNER JOIN contracts AS b ON a.client_id=b.client_id ' \
-#                 'WHERE b.status_code=1 AND a.p_surname = "ХАГУРОВ"' \
+#                 'WHERE b.status_code=1 AND a.p_surname = "РОДИЧЕВ"' \
 
 #                 'WHERE b.status_code=101'
 
@@ -244,6 +245,16 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     link = 'https://ad.admitad.com/g/47rub4kekv6fa4326e145f4e53bb13/?subid=finmarket&subid1=' + res_inp['iId']
     driver.get(url=link)
     time.sleep(1)
+    elem = p(d=driver, f='p', **inputtity['ФИО'])
+    wj(driver)
+    elem.send_keys('.')
+    wj(driver)
+    lang_check = p(d=driver, f='p', **inputtity['ФИОЗнач'])
+    wj(driver)
+    if lang_check == 'ю':
+        ActionChains(driver).key_down(Keys.LEFT_ALT).key_down(Keys.LEFT_SHIFT)\
+                            .click(elem).key_up(Keys.LEFT_ALT).key_up(Keys.LEFT_SHIFT).perform()
+    wj(driver)
     my_input(driver, ['ФИО', 'МобТелефон', 'Email', 'КредЛимит'], res_inp, inputtity)
     if p(d = driver, f = 'p', **clicktity['СоглашенКонфиденцСостояние']) == 'ui-checkbox app-form-action-agreement':
         wj(driver)

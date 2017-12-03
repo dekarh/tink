@@ -41,6 +41,8 @@ inputtity = {
 'Имя' : {'t': 'x', 's': '//INPUT[@type="text"][@name="name"]', 'SQL': "a.p_name"}, # Имя
 'Отчество' : {'t': 'x', 's': '//INPUT[@type="text"][@name="patronymic"]', 'SQL': "a.p_lastname"}, # Отчество
 'ФИО' : {'t': 'x', 's': '//INPUT[@type="text"][@name="fio"]', 'SQL': "CONCAT_WS(' ',a.p_surname,a.p_name,a.p_lastname)"},
+'ФИОЗнач' : {'t': 'x', 's': '//INPUT[@type="text"][@name="fio"]', 'a' : 'text',
+             'SQL': "CONCAT_WS(' ',a.p_surname,a.p_name,a.p_lastname)"},
 'МобТелефон' : {'t': 'x', 's': '//INPUT[@type="tel"][@name="phone_mobile"]', 'SQL': "b.phone_personal_mobile"}, # Мобильный телефон
 'СНИЛС' : {'t': 'x', 's': '//INPUT[@type="tel"][@name="social_security_no"]', 'SQL': "a.number"},
 'Email' : {'t': 'x', 's': '//INPUT[@type="text"][@name="email"]', 'SQL': "a.email"}, # Электронная почта
