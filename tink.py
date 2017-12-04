@@ -244,16 +244,20 @@ while len(rows) > 0:                    # Цикл по строкам табл�
     link = 'https://ad.admitad.com/g/47rub4kekv6fa4326e145f4e53bb13/?subid=finmarket&subid1=' + res_inp['iId']
     driver.get(url=link)
     time.sleep(1)
+    a = """
     elem = p(d=driver, f='p', **inputtity['ФИО'])
     wj(driver)
     elem.send_keys('.')
     wj(driver)
     lang_check = p(d=driver, f='p', **inputtity['ФИОЗнач'])
     wj(driver)
-    if lang_check == 'ю':
+    if lang_check == 'Ю':
         ActionChains(driver).key_down(Keys.LEFT_ALT).key_down(Keys.LEFT_SHIFT)\
                             .click(elem).key_up(Keys.LEFT_ALT).key_up(Keys.LEFT_SHIFT).perform()
     wj(driver)
+    elem.send_keys(Keys.BACK_SPACE)
+    wj(driver)
+    """
     my_input(driver, ['ФИО', 'МобТелефон', 'Email', 'КредЛимит'], res_inp, inputtity)
     if p(d = driver, f = 'p', **clicktity['СоглашенКонфиденцСостояние']) == 'ui-checkbox app-form-action-agreement':
         wj(driver)
